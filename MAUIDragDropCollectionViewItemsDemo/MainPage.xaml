@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MAUIDragDropCollectionViewItemsDemo.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converter="clr-namespace:MAUIDragDropCollectionViewItemsDemo"
+    x:Name="MainPageContainer">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converter:BoolToColorConverter x:Key="BoolToColor" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid
+        Padding="30,5"
+        HorizontalOptions="Fill"
+        RowDefinitions="*,Auto"
+        RowSpacing="10"
+        VerticalOptions="Fill">
+
+        <CollectionView
+            Grid.Row="0"
+            Margin="0,30,0,0"
+            ItemsSource="{Binding UserList}"
+            SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame
+                        Padding="3"
+                        BorderColor="{StaticResource Primary}"
+                        CornerRadius="0"
+                        IsClippedToBounds="True">
+                        <VerticalStackLayout>
+                            <StackLayout
+                                Padding="10"
+                                BackgroundColor="{Binding IsBeingDragged, Converter={StaticResource BoolToColor}}"
+                                HeightRequest="60"
+                                HorizontalOptions="FillAndExpand"
+                                Orientation="Horizontal"
+                                VerticalOptions="FillAndExpand">
+
+                                <!--  User Image  -->
+                                <Image
+                                    HeightRequest="50"
+                                    Source="user.png"
+                                    WidthRequest="50">
+                                    <Image.Clip>
+                                        <EllipseGeometry
+                                            Center="50,50"
+                                            RadiusX="100"
+                                            RadiusY="100" />
+                                    </Image.Clip>
+                                </Image>
+
+                                <!--  User Name  -->
+                                <Label
+                                    x:Name="UserName"
+                                    Margin="10,0,0,0"
+                                    HorizontalOptions="FillAndExpand"
+                                    Text="{Binding UserName}"
+                                    TextColor="Black"
+                                    VerticalTextAlignment="Center" />
+
+                                <!--  Delete Icon  -->
+                                <Frame
+                                    Padding="7"
+                                    CornerRadius="15"
+                                    HeightRequest="30"
+                                    HorizontalOptions="EndAndExpand"
+                                    WidthRequest="30">
+                                    <Image Source="delete_user.png" />
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.DeleteUserCommand, Source={x:Reference MainPageContainer}}" CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                </Frame>
+
+                                <StackLayout.GestureRecognizers>
+                                    <DragGestureRecognizer
+                                        CanDrag="True"
+                                        DragStartingCommand="{Binding BindingContext.ItemDraggedCommand, Source={x:Reference MainPageContainer}}"
+                                        DragStartingCommandParameter="{Binding}" />
+                                    <DropGestureRecognizer
+                                        AllowDrop="True"
+                                        DragLeaveCommand="{Binding BindingContext.ItemDragLeaveCommand, Source={x:Reference MainPageContainer}}"
+                                        DragLeaveCommandParameter="{Binding}"
+                                        DragOverCommand="{Binding BindingContext.ItemDraggedOverCommand, Source={x:Reference MainPageContainer}}"
+                                        DragOverCommandParameter="{Binding}"
+                                        DropCommand="{Binding BindingContext.ItemDroppedCommand, Source={x:Reference MainPageContainer}}"
+                                        DropCommandParameter="{Binding}" />
+                                </StackLayout.GestureRecognizers>
+                            </StackLayout>
+
+                            <StackLayout
+                                BackgroundColor="LightGray"
+                                HeightRequest="30"
+                                HorizontalOptions="FillAndExpand"
+                                IsVisible="{Binding IsBeingDraggedOver}"
+                                VerticalOptions="FillAndExpand" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <VerticalStackLayout Grid.Row="1">
+
+            <Entry Placeholder="Type name" Text="{Binding User}" />
+
+            <Button
+                Margin="0,10,0,0"
+                Command="{Binding AddUserCommand}"
+                HorizontalOptions="CenterAndExpand"
+                Text="Add User" />
+
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>
+
